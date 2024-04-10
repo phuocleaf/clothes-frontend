@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sửa sản phẩm</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body>
+  <header class="container-fluid bg-primary text-white">
+    <div class="container">
+      <h1>Sửa sản phẩm</h1>
+    </div>
+  </header>
+
+  <section class="container my-5">
+    <form id="edit-product-form">
+      <div class="mb-3">
+        <label for="name" class="form-label">Tên sản phẩm:</label>
+        <input type="text" name="name" id="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <!-- <label for="product-image" class="form-label">Ảnh sản phẩm:</label> -->
+        <img src="" alt="Ảnh sản phẩm" id="product-image" class="img-thumbnail mt-2" style="max-width: 200px;">
+      </div>
+      <div class="mb-3">
+        <label for="price" class="form-label">Giá sản phẩm:</label>
+        <input type="number" name="price" id="price" class="form-control" required>
+      </div>
+
+      <h4 class="mt-3">Số lượng cho mỗi size:</h4>
+      <div class="row">
+        <div class="col-md-3">
+          <label for="size_s" class="form-label">Size S:</label>
+          <input type="text" name="size_s" id="size_s" class="form-control" readonly>
+          <input type="number" name="update_size_s" id="update_size_s" class="form-control mt-2" placeholder="">
+        </div>
+        <div class="col-md-3">
+          <label for="size_m" class="form-label">Size M:</label>
+          <input type="text" name="size_m" id="size_m" class="form-control" readonly>
+          <input type="number" name="update_size_m" id="update_size_m" class="form-control mt-2" placeholder="">
+        </div>
+        <div class="col-md-3">
+          <label for="size_l" class="form-label">Size L:</label>
+          <input type="text" name="size_l" id="size_l" class="form-control" readonly>
+          <input type="number" name="update_size_l" id="update_size_l" class="form-control mt-2" placeholder="">
+        </div>
+        <div class="col-md-3">
+          <label for="size_xl" class="form-label">Size XL:</label>
+          <input type="text" name="size_xl" id="size_xl" class="form-control" readonly>
+          <input type="number" name="update_size_xl" id="update_size_xl" class="form-control mt-2" placeholder="">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-3">Lưu</button>
+      <button type="button" class="btn btn-primary mt-3" onclick="window.location.href = 'products.html'">Trở lại trang chủ</button>
+    </form>
+  </section>
+
+  <footer class="container-fluid bg-primary text-white">
+    <div class="container">
+      <p>Copyright &copy; 2023</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    window.onload = async function () {
+      if (productId) {
+        const response = await fetch(`http://localhost:3000/api/products/get-product/${productId}`);
+        if (response.ok) {
+          const product = await response.json();
+          populateForm(product);
+        } else {
+          console.error('Failed to fetch product:', response.status);
+        }
+      } else {
+        console.error('Product ID not found in URL');
+      }
+    };
+
+    function populateForm(product) {
+      document.getElementById('name').value = product.name;
+      document.getElementById('price').value = product.price;
+      document.getElementById('size_s').value = product.size_s;
+      document.getElementById('size_m').value = product.size_m;
+      document.getElementById('size_l').value = product.size_l;
+      document.getElementById('size_xl').value = product.size_xl;
+
+      // Hiển thị ảnh sản phẩm
+      document.getElementById('product-image').src = `http://localhost:3000/api/image/${product.image}`;
+    }
+
+    const editProductForm = document.getElementById('edit-product-form');
+    editProductForm.onsubmit = async function (event) {
+      event.preventDefault();
+      const size_s = parseInt(document.getElementById('size_s').value);
+      const size_m = parseInt(document.getElementById('size_m').value);
+      const size_l = parseInt(document.getElementById('size_l').value);
+      const size_xl = parseInt(document.getElementById('size_xl').value);
+      const name = document.getElementById('name').value;
+      const price = document.getElementById('price').value;
+      const update_size_s = parseInt(document.getElementById('update_size_s').value);
+      const update_size_m = parseInt(document.getElementById('update_size_m').value);
+      const update_size_l = parseInt(document.getElementById('update_size_l').value);
+      const update_size_xl = parseInt(document.getElementById('update_size_xl').value);
+
+      // Kiểm tra tổng số lượng sau cập nhật
+      const total_size_s = size_s + update_size_s;
+      const total_size_m = size_m + update_size_m;
+      const total_size_l = size_l + update_size_l;
+      const total_size_xl = size_xl + update_size_xl;
+
+      // Kiểm tra nếu tổng số lượng sau cập nhật là âm thì ngăn không cho submit
+      if (total_size_s < 0 || total_size_m < 0 || total_size_l < 0 || total_size_xl < 0) {
+        alert('Số lượng sau cập nhật không thể âm. Vui lòng kiểm tra lại!');
+        return; // Ngăn không cho submit
+      }
+
+      const data = {
+        name: name,
+        price: price,
+        size_s: size_s,
+        size_m: size_m,
+        size_l: size_l,
+        size_xl: size_xl,
+        update_size_s: update_size_s,
+        update_size_m: update_size_m,
+        update_size_l: update_size_l,
+        update_size_xl: update_size_xl
+      };
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/products/update-product/${productId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (response) {
+          const responseData = await response.json();
+          console.log(responseData); // Xử lý phản hồi từ máy chủ
+          alert('Cập nhật sản phẩm thành công!');
+          // Tải lại trang để phản ánh các thay đổi
+          window.location.href = `edit_product.html?id=${productId}`;
+        } else {
+          console.error('Server response was not ok.');
+        }
+      } catch (error) {
+        console.error('There was an error with the fetch operation:', error);
+      }
+    };
+  </script>  
+</body>
+</html>
+
