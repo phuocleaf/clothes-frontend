@@ -1,42 +1,46 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>P-Clothes</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 </head>
+
 <body>
   <header class="container-fluid bg-primary text-white">
     <div class="container">
-      <h1>Trang quản lý bán hàng</h1>
+      <h1>Quản lý bán hàng</h1>
     </div>
   </header>
 
   <section class="container my-5">
     <h2>Thông tin tổng quan</h2>
     <div class="row">
+      <!-- Các phần thông tin -->
       <div class="col-md-3">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Tổng số đơn hàng</h5>
-            <p class="card-text">100</p>
+            <h5 class="card-title">Số đơn trong tháng</h5>
+            <p class="card-text" id="total-orders">...</p>
           </div>
         </div>
       </div>
       <div class="col-md-3">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Tổng doanh thu</h5>
-            <p class="card-text">10.000.000 VNĐ</p>
+            <h5 class="card-title">Doanh thu trong tháng</h5>
+            <p class="card-text" id="total-income">...</p>
           </div>
         </div>
       </div>
       <div class="col-md-3">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Sản phẩm bán chạy nhất</h5>
-            <p class="card-text">Tên sản phẩm</p>
+            <h5 class="card-title">Bán chạy nhất tháng</h5>
+            <p class="card-text" id="best-selling-product">...</p>
           </div>
         </div>
       </div>
@@ -44,7 +48,7 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Khách hàng mới nhất</h5>
-            <p class="card-text">Tên khách hàng</p>
+            <p class="card-text" id="latest-customer">...</p>
           </div>
         </div>
       </div>
@@ -52,6 +56,7 @@
 
     <div class="row mt-5">
       <div class="col">
+        <!-- Các liên kết và nút -->
         <a href="orders.html" class="btn btn-primary">Quản lý đơn hàng</a>
         <a href="products.html" class="btn btn-primary">Quản lý sản phẩm</a>
         <button id="logout-btn" class="btn btn-primary">Đăng Xuất</button>
@@ -59,25 +64,63 @@
     </div>
   </section>
 
-  <!-- <footer class="container-fluid bg-primary text-white">
-    <div class="container">
-      <p>Copyright &copy; 2023</p>
-    </div>
-  </footer> -->
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
   <script>
-    // Xử lý sự kiện đăng xuất
+    // Gọi API để lấy thông tin sản phẩm bán chạy nhất trong tháng
+    fetch('http://localhost:3000/api/orders/get-best-selling-product-in-month')
+      .then(response => response.json())
+      .then(data => {
+        
+        const bestSellingProduct = data[0].name;
+        
+        document.getElementById('best-selling-product').textContent = bestSellingProduct;
+      })
+      .catch(error => console.error('Error fetching best selling product:', error));
+
+    fetch('http://localhost:3000/api/orders/get-orders-in-month')
+      .then(response => response.json())
+      .then(data => {
+       
+        const totalOrders = data[0].count;
+        
+        document.getElementById('total-orders').textContent = totalOrders;
+      })
+      .catch(error => console.error('Error fetching total orders:', error));
+
+    fetch('http://localhost:3000/api/orders/get-order-total')
+      .then(response => response.json())
+      .then(data => {
+        
+        const totalIncome = data[0].total;
+        
+        document.getElementById('total-income').textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalIncome);
+      })
+      .catch(error => console.error('Error fetching total income:', error));
+
+    fetch('http://localhost:3000/api/users/get-newest-user')
+      .then(response => response.json())
+      .then(data => {
+        
+        const latestCustomerName = data[0].name;
+        
+        document.getElementById('latest-customer').textContent = latestCustomerName;
+      })
+      .catch(error => console.error('Error fetching latest customer:', error));
+
+   
     const logoutButton = document.getElementById('logout-btn');
-    logoutButton.addEventListener('click', function() {
-      // Hiển thị hộp thoại xác nhận
+    logoutButton.addEventListener('click', function () {
+      
       if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
-        // Xóa thông tin đăng nhập từ localStorage
+        
         localStorage.removeItem('token');
-        // Chuyển hướng người dùng đến trang login.html
+        
         window.location.href = 'login.html';
       }
     });
   </script>
 </body>
+
 </html>

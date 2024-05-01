@@ -108,7 +108,7 @@
       orderDetailContainer.innerHTML = orderDetailHTML;
 
       // Disable update status button if order status is "Đã huỷ"
-      if (orderDetails.status === "Đã huỷ") {
+      if (orderDetails.status === "Đã huỷ" || orderDetails.status === "Đã giao") {
         updateStatusBtn.disabled = true;
         updateStatusBtn.hidden = true;
       } else {
